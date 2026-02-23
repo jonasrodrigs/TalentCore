@@ -8,7 +8,7 @@ public class Certificacao {
     private String nome;
     private String instituicao;
     private LocalDate dataObtencao;
-    private LocalDate dataExpiracao; // null = não expira
+    private LocalDate dataExpiracao; // null = não expirq
     private String numeroCredencial;
     private String urlCredencial;
 
