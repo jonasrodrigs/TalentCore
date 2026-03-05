@@ -1,11 +1,20 @@
 package br.com.talentcore.talentos.application.port.out;
 
 import br.com.talentcore.talentos.domain.Candidato;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface CandidatoRepository {
-    String salvar(Candidato candidato);
+
+    boolean existsByEmail(String email);
+
+    String salvar(Candidato c);
+
     Optional<Candidato> buscarPorId(String id);
+
     List<Candidato> buscarPorFiltros(String tecnologia, String nivel, String cidade, String estado, String idioma, String nivelIdioma);
+
+    // Novo: atualização do agregado completo
+    void atualizar(Candidato candidato);
 }

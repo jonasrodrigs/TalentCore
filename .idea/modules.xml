@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/TalentCore.iml" filepath="$PROJECT_DIR$/TalentCore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/talentcore.iml" filepath="$PROJECT_DIR$/talentcore.iml" />
     </modules>
   </component>
 </project>

@@ -28,4 +28,6 @@ public class Disponibilidade {
     public void setHorarios(String horarios) {
         this.horarios = horarios;
     }
+
+
 }

@@ -1,0 +1,66 @@
+###############################################################
+#  PROFILE PADRÃO (MVP) — SEM BANCO DE DADOS
+#  Usa o repositório In-Memory (BeanConfig → @Profile("mvp"))
+#  Aqui desligamos a autoconfiguração do DataSource,
+#  porque quem usa JDBC é só o adapter Oracle.
+###############################################################
+
+spring:
+  profiles:
+    active: mvp    # <- Este é o perfil padrão ao rodar a aplicação
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+
+
+###############################################################
+#  PROFILE ORACLE — COM BANCO DE DADOS
+#  Usa o CandidatoRepositoryOracle (BeanConfig → @Profile("oracle"))
+#  Continuamos EXCLUINDO a autoconfiguração do DataSource,
+#  pois seu adapter usa DatabaseConfig.getConnection()
+#  e lê TC_DB_URL, TC_DB_USER, TC_DB_PASSWORD do ambiente.
+###############################################################
+
+---
+spring:
+  config:
+    activate:
+      on-profile: oracle
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration
+
+
+###############################################################
+#  IMPORTANTE:
+#  Quando rodar com Oracle, você DEVE passar as variáveis:
+#
+#  TC_DB_URL=jdbc:oracle:thin:@//192.168.101.10:1521/XEPDB1
+#  TC_DB_USER=TALENTCORE
+#  TC_DB_PASSWORD=<SUA_SENHA>
+#
+#  Isso é lido diretamente pelo seu DatabaseConfig.java
+###############################################################
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

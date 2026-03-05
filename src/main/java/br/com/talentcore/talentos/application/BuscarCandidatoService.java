@@ -1,32 +1,28 @@
 package br.com.talentcore.talentos.application;
 
+import java.util.List;
+
 import br.com.talentcore.talentos.application.port.in.BuscarCandidatoUseCase;
 import br.com.talentcore.talentos.application.port.out.CandidatoRepository;
 import br.com.talentcore.talentos.domain.Candidato;
 
-import java.util.List;
-import java.util.Objects;
-
 public class BuscarCandidatoService implements BuscarCandidatoUseCase {
 
-    private final CandidatoRepository repo;
+    private final CandidatoRepository repository;
 
-    public BuscarCandidatoService(CandidatoRepository repo) {
-        this.repo = repo;
+    public BuscarCandidatoService(CandidatoRepository repository) {
+        this.repository = repository;
     }
 
     @Override
     public List<Candidato> executar(Filtros f) {
-        Objects.requireNonNull(f, "Filtros não podem ser nulos");
-        return repo.buscarPorFiltros(
-                safe(f.tecnologia),
-                safe(f.nivel),
-                safe(f.cidade),
-                safe(f.estado),
-                safe(f.idioma),
-                safe(f.nivelIdioma)
+        return repository.buscarPorFiltros(
+                f == null ? null : f.tecnologia,
+                f == null ? null : f.nivel,
+                f == null ? null : f.cidade,
+                f == null ? null : f.estado,
+                f == null ? null : f.idioma,
+                f == null ? null : f.nivelIdioma
         );
     }
-
-    private String safe(String s) { return s == null ? "" : s.trim(); }
 }
