@@ -1,10 +1,8 @@
-package br.com.talentcore.talentos.infrastructure.persistence.mvp;
+package br.com.talentcore.talentos.infrastructure.persistence.inmemory;
 
 import br.com.talentcore.talentos.application.port.out.CandidatoRepository;
 import br.com.talentcore.talentos.domain.Candidato;
-import br.com.talentcore.talentos.domain.Experiencia;
 import br.com.talentcore.talentos.domain.Habilidade;
-import br.com.talentcore.talentos.domain.Idioma;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
