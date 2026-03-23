@@ -1,12 +1,12 @@
 ###############################################################
 # PROFILE PADRÃO (MVP) — SEM BANCO DE DADOS
 # Usa o repositório In-Memory (BeanConfig → @Profile("mvp"))
-# Desliga autoconfig de DataSource/JdbcTemplate (seu adapter Oracle
-# usa DatabaseConfig.getConnection() quando o perfil "oracle" estiver ativo).
+# Desliga autoconfig de DataSource/JdbcTemplate (o adapter Oracle
+# usa DatabaseConfig.getConnection() apenas no perfil "oracle").
 ###############################################################
 spring:
   profiles:
-    active: mvp  # Perfil padrão ao subir a aplicação
+    active: oracle   # <<< PERFIL ATIVO ATUAL (ajuste para 'mvp' se quiser InMemory)
 
   autoconfigure:
     exclude:
@@ -25,18 +25,15 @@ management:
 # Propriedades do JWT (usadas por JwtService):
 security:
   jwt:
-    # Você pode sobrescrever via variável de ambiente JWT_SECRET
-    secret: ${JWT_SECRET:dev-secret-please-change-32bytes-or-more-123456}
-    # Expiração do token em minutos (padrão 120). Pode sobrescrever via JWT_EXP_MINUTES
+    secret: ${JWT_SECRET:change-this-secret-in-prod-please-32bytes-min}
     exp-minutes: ${JWT_EXP_MINUTES:120}
-
 
 ###############################################################
 # PROFILE ORACLE — COM BANCO DE DADOS
 # Usa o CandidatoRepositoryOracle (BeanConfig → @Profile("oracle"))
-# Mantém EXCLUÍDA a autoconfig do DataSource, pois o adapter Oracle
-# usa DatabaseConfig.getConnection() lendo variáveis do ambiente:
-#   - TC_DB_URL       (ex.: jdbc:oracle:thin:@//localhost:1521/XEPDB1)
+# Mantém EXCLUÍDA a autoconfig do DataSource; o adapter Oracle
+# usa DatabaseConfig.getConnection() lendo variáveis de ambiente:
+#   - TC_DB_URL       (ex.: jdbc:oracle:thin:@//192.168.101.10:1521/XEPDB1)
 #   - TC_DB_USER      (ex.: TALENTCORE)
 #   - TC_DB_PASSWORD  (ex.: sua_senha)
 ###############################################################
@@ -60,8 +57,46 @@ management:
       exposure:
         include: health,info
 
-# (Opcional) Você pode definir um secret diferente em produção/oracle:
 security:
   jwt:
     secret: ${JWT_SECRET:change-this-secret-in-prod-please-32bytes-min}
     exp-minutes: ${JWT_EXP_MINUTES:120}
+
+# (opcional) Log básico
+logging:
+  level:
+    root: INFO
+    br.com.talentcore: INFO
+
+###############################################################
+# PROFILE MVP — IN-MEMORY (sem banco)
+###############################################################
+---
+spring:
+  config:
+    activate:
+      on-profile: mvp
+
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-please-32bytes-or-more-123456}
+    exp-minutes: ${JWT_EXP_MINUTES:120}
+
+logging:
+  level:
+    root: INFO
+    br.com.talentcore: INFO

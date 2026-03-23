@@ -1,23 +1,65 @@
 package br.com.talentcore.talentos.domain;
 
-import java.util.List;
 import java.time.LocalDate;
+import java.util.List;
 
+/**
+ * Entidade de domínio: Candidato
+ *
+ * Representa o currículo completo do candidato.
+ * Estrutura mantida simples (POJO), sem regras de negócio.
+ */
 public class Candidato {
+
+    // ------------------------------------------------------------
+    // Identificação
+    // ------------------------------------------------------------
+
     private String id; // UUID
     private String nomeCompleto;
     private LocalDate dataNascimento;
 
+    // ------------------------------------------------------------
+    // Contato e endereço
+    // ------------------------------------------------------------
+
     private Contato contato;
     private Endereco endereco;
+
+    // ------------------------------------------------------------
+    // Currículo (campos simples)
+    // ------------------------------------------------------------
+
+    /** Campo universal: cargo / função / ofício */
+    private String ocupacao;
+
+    private String resumoProfissional;
     private String linkedin;
     private String github;
     private String portfolio;
+
+    /** URL pública da foto do candidato (alinha com coluna FOTO_URL no Oracle) */
+    private String fotoUrl;
+
+    // ------------------------------------------------------------
+    // Dados pessoais
+    // ------------------------------------------------------------
+
     private String nacionalidade;
     private String estadoCivil;
-    private String resumoProfissional;
+
+    // ------------------------------------------------------------
+    // Objetivo / disponibilidade
+    // ------------------------------------------------------------
+
+    /** Observação: no Oracle está como VARCHAR2(50); mantido como String no domínio */
     private String pretensaoSalarial;
+
     private Disponibilidade disponibilidade;
+
+    // ------------------------------------------------------------
+    // Estrutura curricular (relacionamentos)
+    // ------------------------------------------------------------
 
     private List<Formacao> formacoes;
     private List<Experiencia> experiencias;
@@ -30,6 +72,26 @@ public class Candidato {
     private List<Conquista> conquistas;
     private List<ReferenciaProfissional> referencias;
     private List<Anexo> anexos;
+
+    // ------------------------------------------------------------
+    // Getters / Setters
+    // ------------------------------------------------------------
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getNomeCompleto() {
+        return nomeCompleto;
+    }
+
+    public void setNomeCompleto(String nomeCompleto) {
+        this.nomeCompleto = nomeCompleto;
+    }
 
     public LocalDate getDataNascimento() {
         return dataNascimento;
@@ -55,6 +117,24 @@ public class Candidato {
         this.endereco = endereco;
     }
 
+    // ---------------- Currículo ----------------
+
+    public String getOcupacao() {
+        return ocupacao;
+    }
+
+    public void setOcupacao(String ocupacao) {
+        this.ocupacao = ocupacao;
+    }
+
+    public String getResumoProfissional() {
+        return resumoProfissional;
+    }
+
+    public void setResumoProfissional(String resumoProfissional) {
+        this.resumoProfissional = resumoProfissional;
+    }
+
     public String getLinkedin() {
         return linkedin;
     }
@@ -71,20 +151,30 @@ public class Candidato {
         this.github = github;
     }
 
-    public String getNacionalidade() {
-        return nacionalidade;
-    }
-
-    public void setNacionalidade(String nacionalidade) {
-        this.nacionalidade = nacionalidade;
-    }
-
     public String getPortfolio() {
         return portfolio;
     }
 
     public void setPortfolio(String portfolio) {
         this.portfolio = portfolio;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
+    }
+
+    // ---------------- Dados pessoais ----------------
+
+    public String getNacionalidade() {
+        return nacionalidade;
+    }
+
+    public void setNacionalidade(String nacionalidade) {
+        this.nacionalidade = nacionalidade;
     }
 
     public String getEstadoCivil() {
@@ -95,12 +185,14 @@ public class Candidato {
         this.estadoCivil = estadoCivil;
     }
 
-    public String getResumoProfissional() {
-        return resumoProfissional;
+    // ---------------- Disponibilidade ----------------
+
+    public String getPretensaoSalarial() {
+        return pretensaoSalarial;
     }
 
-    public void setResumoProfissional(String resumoProfissional) {
-        this.resumoProfissional = resumoProfissional;
+    public void setPretensaoSalarial(String pretensaoSalarial) {
+        this.pretensaoSalarial = pretensaoSalarial;
     }
 
     public Disponibilidade getDisponibilidade() {
@@ -111,13 +203,7 @@ public class Candidato {
         this.disponibilidade = disponibilidade;
     }
 
-    public String getPretensaoSalarial() {
-        return pretensaoSalarial;
-    }
-
-    public void setPretensaoSalarial(String pretensaoSalarial) {
-        this.pretensaoSalarial = pretensaoSalarial;
-    }
+    // ---------------- Estrutura curricular ----------------
 
     public List<Formacao> getFormacoes() {
         return formacoes;
@@ -205,21 +291,5 @@ public class Candidato {
 
     public void setAnexos(List<Anexo> anexos) {
         this.anexos = anexos;
-    }
-
-    public String getNomeCompleto() {
-        return nomeCompleto;
-    }
-
-    public void setNomeCompleto(String nomeCompleto) {
-        this.nomeCompleto = nomeCompleto;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 }

@@ -13,6 +13,7 @@ public class CandidatoMapper {
 
     // ----------------------
     // Request → Domain
+    // (mantido: não adiciona campos novos que não existam no request atual)
     // ----------------------
     public static Candidato fromRequest(CandidatoRequest req) {
         if (req == null) return null;
@@ -102,28 +103,64 @@ public class CandidatoMapper {
 
     // ----------------------
     // Domain → Response
+    // (ATUALIZADO com campos de currículo e disponibilidade)
     // ----------------------
     public static CandidatoResponse toResponse(Candidato c) {
         if (c == null) return null;
 
         CandidatoResponse r = new CandidatoResponse();
+
+        // Identificação
         r.id = c.getId();
         r.nomeCompleto = c.getNomeCompleto();
+        r.dataNascimento = (c.getDataNascimento() != null) ? c.getDataNascimento().toString() : null; // ISO yyyy-MM-dd
 
-        // contato > email
+        // Contato
         r.email = (c.getContato() != null) ? c.getContato().getEmail() : null;
+        r.telefone = (c.getContato() != null) ? c.getContato().getTelefone() : null;
 
-        // endereço reduzido
-        r.cidade = c.getEndereco() != null ? c.getEndereco().getCidade() : null;
-        r.estado = c.getEndereco() != null ? c.getEndereco().getEstado() : null;
-        r.pais   = c.getEndereco() != null ? c.getEndereco().getPais() : null;
+        // Endereço (flat)
+        r.bairro = (c.getEndereco() != null) ? c.getEndereco().getBairro() : null;
+        r.cidade = (c.getEndereco() != null) ? c.getEndereco().getCidade() : null;
+        r.estado = (c.getEndereco() != null) ? c.getEndereco().getEstado() : null;
+        r.pais   = (c.getEndereco() != null) ? c.getEndereco().getPais() : null;
 
-        // habilidades
-        r.habilidades = c.getHabilidadesTecnicas() != null
+        // Currículo (universais)
+        r.ocupacao = c.getOcupacao();
+        r.resumoProfissional = c.getResumoProfissional();
+
+        // Links / Mídia
+        r.linkedin = c.getLinkedin();
+        r.github   = c.getGithub();
+        r.portfolio= c.getPortfolio();
+        r.fotoUrl  = c.getFotoUrl();
+
+        // Dados pessoais
+        r.nacionalidade = c.getNacionalidade();
+        r.estadoCivil   = c.getEstadoCivil();
+
+        // Disponibilidade / objetivo
+        r.pretensaoSalarial = c.getPretensaoSalarial();
+        if (c.getDisponibilidade() != null) {
+            if (c.getDisponibilidade() instanceof Disponibilidade) {
+                Disponibilidade d = c.getDisponibilidade();
+                try {
+                    r.aceitaViagens = d.getAceitaViagensNullable();
+                    r.aceitaMudanca = d.getAceitaMudancaNullable();
+                } catch (Throwable ignore) {
+                    r.aceitaViagens = d.isAceitaViagens();
+                    r.aceitaMudanca = d.isAceitaMudanca();
+                }
+                r.horarios = d.getHorarios();
+            }
+        }
+
+        // Habilidades (nomes)
+        r.habilidades = (c.getHabilidadesTecnicas() != null)
                 ? c.getHabilidadesTecnicas().stream().map(Habilidade::getNome).collect(Collectors.toList())
                 : List.of();
 
-        // tecnologias (experiência + projetos)
+        // Tecnologias (agregadas de experiências e projetos)
         List<String> tecnologias = new ArrayList<>();
         if (c.getExperiencias() != null) {
             c.getExperiencias().forEach(e -> {
@@ -137,16 +174,21 @@ public class CandidatoMapper {
         }
         r.tecnologias = tecnologias;
 
-        // idiomas
-        r.idiomas = c.getIdiomas() != null
+        // Idiomas (string)
+        r.idiomas = (c.getIdiomas() != null)
                 ? c.getIdiomas().stream().map(Idioma::getIdioma).collect(Collectors.toList())
                 : List.of();
+
+        // Experiências / Projetos (detalhe)
+        r.experiencias = c.getExperiencias();
+        r.projetos     = c.getProjetos();
 
         return r;
     }
 
     // ----------------------
     // merge() – atualização parcial
+    // (mantido: não referencia campos que não existam no request atual)
     // ----------------------
     public static void merge(Candidato atual, CandidatoRequest req) {
         if (req == null) return;
@@ -183,7 +225,12 @@ public class CandidatoMapper {
                 atual.getEndereco().setCep(req.endereco.cep);
         }
 
-        // substituições completas
+        // >>> NOVO: foto
+        if (req.fotoUrl != null) {
+            atual.setFotoUrl(req.fotoUrl);
+        }
+
+        // substituições completas (mantidas)
         if (req.idiomas != null) atual.setIdiomas(fromRequest(req).getIdiomas());
         if (req.habilidadesTecnicas != null) atual.setHabilidadesTecnicas(fromRequest(req).getHabilidadesTecnicas());
         if (req.experiencias != null) atual.setExperiencias(fromRequest(req).getExperiencias());

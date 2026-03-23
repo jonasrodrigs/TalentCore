@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -20,6 +21,9 @@ import java.util.function.Function;
  * - Assinatura: HMAC SHA-256
  * - Configurações: security.jwt.secret / security.jwt.exp-minutes (application.yml)
  * - subject do token = username (no nosso caso, o e-mail)
+ *
+ * Agora com suporte a "claims" customizadas (ex.: plan, roles, features),
+ * sem quebrar o método atual.
  */
 @Service
 public class JwtService {
@@ -40,7 +44,7 @@ public class JwtService {
     }
 
     /* =========================================================
-       Emissão
+       Emissão (método existente - preservado)
        ========================================================= */
     public String generateToken(UserDetails user) {
         Date now = new Date();
@@ -48,6 +52,22 @@ public class JwtService {
 
         return Jwts.builder()
                 .setSubject(user.getUsername()) // e-mail/username
+                .setIssuedAt(now)
+                .setExpiration(exp)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    /* =========================================================
+       Emissão (novo overload com claims customizadas)
+       ========================================================= */
+    public String generateToken(UserDetails user, Map<String, Object> claims) {
+        Date now = new Date();
+        Date exp = new Date(now.getTime() + expirationMillis);
+
+        return Jwts.builder()
+                .setClaims(claims)               // <- claims custom (plan, roles, etc.)
+                .setSubject(user.getUsername())  // e-mail/username
                 .setIssuedAt(now)
                 .setExpiration(exp)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -96,17 +116,22 @@ public class JwtService {
        Helpers internos
        ========================================================= */
 
-    private <T> T extractClaim(String token, Function<Claims, T> resolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> resolver) {
         Claims claims = extractAllClaims(token);
         return resolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         // Lança JwtException se token for inválido/assinado com outra chave
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    /** Exposição útil para montar expiresAt no LoginResponse (epochMillis). */
+    public long getExpirationMillis() {
+        return expirationMillis;
     }
 }
